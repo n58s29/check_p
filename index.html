@@ -1,0 +1,943 @@
+```html
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plan de fouille – Travaux à proximité de voies ferrées</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --card:#101e36;
+      --muted:#a8b3c7;
+      --text:#e8eefc;
+      --border:rgba(255,255,255,.12);
+
+      --ok:#1fa971;
+      --warn:#f2c94c;
+      --mid:#f2994a;
+      --crit:#eb5757;
+
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(79,140,255,.25), transparent 60%),
+                  radial-gradient(900px 600px at 90% 0%, rgba(242,201,76,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding: 22px 18px 10px 18px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1{
+      margin:0 0 6px 0;
+      font-size: 20px;
+      letter-spacing:.2px;
+      font-weight: 720;
+    }
+    .sub{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 980px;
+    }
+
+    main{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 18px 28px 18px;
+      display:grid;
+      grid-template-columns: 390px 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      main{grid-template-columns: 1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 14px 14px 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .card .hd h2{
+      margin:0;
+      font-size: 14px;
+      font-weight: 720;
+      letter-spacing:.2px;
+      color:#f3f6ff;
+    }
+    .card .bd{
+      padding: 14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select{
+      width:100%;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,18,32,.6);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, select:focus{
+      border-color: rgba(79,140,255,.65);
+      box-shadow: 0 0 0 3px rgba(79,140,255,.18);
+    }
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .btnbar{
+      display:flex;
+      gap:10px;
+      margin-top: 6px;
+    }
+    button{
+      flex:1;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(79,140,255,.95), rgba(79,140,255,.72));
+      color: #081025;
+      font-weight: 780;
+      letter-spacing:.2px;
+      cursor:pointer;
+      box-shadow: 0 10px 18px rgba(79,140,255,.18);
+    }
+    button.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      box-shadow:none;
+    }
+    button:hover{filter:brightness(1.03)}
+    button:active{transform: translateY(1px)}
+    .note{
+      margin-top:10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .resultTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--muted);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.07) inset;
+    }
+    .small{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .kv{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .kv .item{
+      padding: 10px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .kv .k{
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .kv .v{
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing:.2px;
+    }
+    .kv .v code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      color: #f3f6ff;
+      background: rgba(0,0,0,.25);
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .measures{
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .measures h3{
+      margin:0 0 8px 0;
+      font-size: 13px;
+      font-weight: 780;
+      letter-spacing:.2px;
+    }
+    .measures ul{
+      margin:0;
+      padding-left: 18px;
+      color: #dce5fb;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .measures li{margin: 6px 0}
+
+    .svgWrap{
+      padding: 0;
+    }
+    .svgTop{
+      padding: 12px 14px 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .svgTop .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+    .pill .mini{
+      width:9px;height:9px;border-radius:50%;
+    }
+    .svgBd{
+      padding: 10px 14px 14px 14px;
+    }
+    svg{
+      width:100%;
+      height: 420px;
+      display:block;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.02));
+    }
+    .warnBox{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(242,201,76,.35);
+      background: rgba(242,201,76,.10);
+      color: #ffeeb3;
+      font-size: 12.5px;
+      line-height: 1.35;
+      display:none;
+    }
+    .footerHint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Détermination du plan de fouille applicable (P0 / P1 / P2)</h1>
+    <p class="sub">
+      Référence géométrique : le point O correspond au pied extérieur du rail le plus proche, au niveau du dessous de traverse (plateforme).
+      Le point de contrôle est le coin inférieur de la fouille côté voie. Les seuils sont évalués via le ratio <b>D / H<sub>eff</sub></b>.
+    </p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="hd">
+        <h2>Entrées terrain</h2>
+        <div class="small">Unités : m (sauf dévers en mm)</div>
+      </div>
+      <div class="bd">
+        <div class="grid">
+          <div class="row2">
+            <div>
+              <label for="H">Profondeur de fouille H (m) depuis TN</label>
+              <input id="H" type="number" step="0.01" min="0" value="1.50" />
+            </div>
+            <div>
+              <label for="D">Distance D (m) bord fouille → pied extérieur rail</label>
+              <input id="D" type="number" step="0.01" min="0" value="2.20" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label for="devers">Dévers de la voie (mm) valeur absolue</label>
+              <input id="devers" type="number" step="1" min="0" value="0" />
+            </div>
+            <div>
+              <label for="cote">Côté de la fouille</label>
+              <select id="cote">
+                <option value="droite">Voie droite</option>
+                <option value="bas">Rail bas</option>
+                <option value="haut">Rail haut</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="ep">Épaisseur de traverse (m)</label>
+            <input id="ep" type="number" step="0.01" min="0" value="0.22" />
+          </div>
+
+          <div class="btnbar">
+            <button id="btnCalc" type="button">Calculer</button>
+            <button id="btnReset" type="button" class="secondary">Réinitialiser</button>
+          </div>
+
+          <div class="note">
+            Rappel : correction dévers <code>delta</code> = +dévers/1000 si côté rail bas, -dévers/1000 si côté rail haut, 0 sinon.
+            Puis <code>H_eff = H - épaisseur_traverse + delta</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Résultat et schéma</h2>
+        <div class="small">Sorties calculées et coupe transversale</div>
+      </div>
+
+      <div class="bd">
+        <div class="resultTop">
+          <div class="badge" id="badge">
+            <span class="dot" id="dot"></span>
+            <span id="planText">—</span>
+          </div>
+          <div class="small" id="ruleText">Seuils : 2,00 / 1,50 / 1,00</div>
+        </div>
+
+        <div class="warnBox" id="warnBox"></div>
+
+        <div class="kv">
+          <div class="item">
+            <div class="k">Correction dévers delta (m)</div>
+            <div class="v"><code id="outDelta">—</code></div>
+          </div>
+          <div class="item">
+            <div class="k">H_eff (m) depuis O</div>
+            <div class="v"><code id="outHeff">—</code></div>
+          </div>
+          <div class="item">
+            <div class="k">Distance D (m)</div>
+            <div class="v"><code id="outD">—</code></div>
+          </div>
+          <div class="item">
+            <div class="k">Ratio D / H_eff</div>
+            <div class="v"><code id="outRatio">—</code></div>
+          </div>
+        </div>
+
+        <div class="measures">
+          <h3>Mesures associées (repères opérationnels)</h3>
+          <div id="measuresBox"></div>
+        </div>
+
+        <div class="card svgWrap" style="margin-top:14px;">
+          <div class="svgTop">
+            <div class="legend">
+              <span class="pill"><span class="mini" style="background:var(--ok)"></span>Zone libre</span>
+              <span class="pill"><span class="mini" style="background:var(--warn)"></span>P0</span>
+              <span class="pill"><span class="mini" style="background:var(--mid)"></span>P1</span>
+              <span class="pill"><span class="mini" style="background:var(--crit)"></span>P2</span>
+            </div>
+            <div class="small">Droites : x = k·y (k = 2,0 ; 1,5 ; 1,0)</div>
+          </div>
+          <div class="svgBd">
+            <svg id="svg" viewBox="0 0 900 420" role="img" aria-label="Coupe transversale voie et fouille"></svg>
+            <div class="footerHint">
+              Le schéma est indicatif et vise à visualiser la position relative du point de contrôle par rapport aux droites de plan.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      "use strict";
+
+      var elH = document.getElementById("H");
+      var elD = document.getElementById("D");
+      var elDevers = document.getElementById("devers");
+      var elCote = document.getElementById("cote");
+      var elEp = document.getElementById("ep");
+
+      var btnCalc = document.getElementById("btnCalc");
+      var btnReset = document.getElementById("btnReset");
+
+      var outDelta = document.getElementById("outDelta");
+      var outHeff = document.getElementById("outHeff");
+      var outD = document.getElementById("outD");
+      var outRatio = document.getElementById("outRatio");
+
+      var planText = document.getElementById("planText");
+      var badge = document.getElementById("badge");
+      var dot = document.getElementById("dot");
+      var measuresBox = document.getElementById("measuresBox");
+      var warnBox = document.getElementById("warnBox");
+
+      var svg = document.getElementById("svg");
+
+      function clamp(v, a, b){
+        return Math.max(a, Math.min(b, v));
+      }
+
+      function fmt(n, d){
+        if (!isFinite(n)) { return "—"; }
+        var p = Math.pow(10, d);
+        return String(Math.round(n * p) / p);
+      }
+
+      function computeDelta(deversMm, cote){
+        var dv = Math.abs(deversMm) / 1000;
+        if (cote === "bas") { return dv; }
+        if (cote === "haut") { return -dv; }
+        return 0;
+      }
+
+      function planFromRatio(r){
+        if (!isFinite(r)) {
+          return { key:"ERR", label:"Entrées invalides", color:"#9aa6bf" };
+        }
+        if (r >= 2.0) {
+          return { key:"LIBRE", label:"Zone libre (pas de contrainte)", color:getCssVar("--ok") };
+        }
+        if (r >= 1.5) {
+          return { key:"P0", label:"Plan P0 (vigilance)", color:getCssVar("--warn") };
+        }
+        if (r >= 1.0) {
+          return { key:"P1", label:"Plan P1 (surveillance renforcée)", color:getCssVar("--mid") };
+        }
+        return { key:"P2", label:"Plan P2 (zone critique)", color:getCssVar("--crit") };
+      }
+
+      function getCssVar(name){
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+
+      function measuresFor(planKey){
+        var html = "";
+        if (planKey === "LIBRE") {
+          html += "<ul>";
+          html += "<li>Contrôles usuels du terrassement et respect des règles de voisinage ferroviaire.</li>";
+          html += "<li>Vérification ponctuelle de la stabilité des talus et des engins par le chef de chantier.</li>";
+          html += "<li>Maintien des protections de chantier et gestion des eaux (pas de ravinement vers la plateforme).</li>";
+          html += "</ul>";
+          return html;
+        }
+        if (planKey === "P0") {
+          html += "<ul>";
+          html += "<li>Vigilance accrue : suivi régulier des cotes et de la distance au rail pendant les phases sensibles.</li>";
+          html += "<li>Organisation des accès et circulation d\u2019engins de façon à limiter les surcharges proches de la voie.</li>";
+          html += "<li>Mise en place de repères de contrôle et information de l\u2019encadrement travaux.</li>";
+          html += "</ul>";
+          return html;
+        }
+        if (planKey === "P1") {
+          html += "<ul>";
+          html += "<li>Surveillance renforcée : contrôles fréquents (déformations, tassements, fissures, stabilité des parois).</li>";
+          html += "<li>Consignes spécifiques aux engins (distance minimale, limitation de tonnage, phasage prudent).</li>";
+          html += "<li>Procédure d\u2019alerte formalisée et possibilité d\u2019arrêt immédiat en cas d\u2019évolution défavorable.</li>";
+          html += "<li>Mesures de soutènement et gestion des eaux recommandées selon le contexte géotechnique.</li>";
+          html += "</ul>";
+          return html;
+        }
+        if (planKey === "P2") {
+          html += "<ul>";
+          html += "<li>Zone critique : étude et méthode dédiées, soutènement obligatoire selon le cas, phasage strict.</li>";
+          html += "<li>Surveillance continue ou très rapprochée, instrumentation possible (repères, niveaux, auscultation).</li>";
+          html += "<li>Coordination ferroviaire renforcée : mesures d\u2019exploitation pouvant aller jusqu\u2019à la consignation de voie.</li>";
+          html += "<li>Arrêt immédiat des travaux et information de la maîtrise d\u2019ouvrage / exploitation en cas d\u2019anomalie.</li>";
+          html += "</ul>";
+          return html;
+        }
+        html += "<div class=\"small\">Aucune mesure affichable : vérifier les entrées.</div>";
+        return html;
+      }
+
+      function setBadge(planObj){
+        var c = planObj.color;
+        dot.style.background = c;
+        badge.style.borderColor = "rgba(255,255,255,.16)";
+        badge.style.background = "rgba(255,255,255,.06)";
+        planText.textContent = planObj.label;
+
+        if (planObj.key === "LIBRE"){ badge.style.boxShadow = "0 0 0 3px rgba(31,169,113,.16) inset"; }
+        if (planObj.key === "P0"){ badge.style.boxShadow = "0 0 0 3px rgba(242,201,76,.16) inset"; }
+        if (planObj.key === "P1"){ badge.style.boxShadow = "0 0 0 3px rgba(242,153,74,.16) inset"; }
+        if (planObj.key === "P2"){ badge.style.boxShadow = "0 0 0 3px rgba(235,87,87,.16) inset"; }
+        if (planObj.key === "ERR"){ badge.style.boxShadow = "0 0 0 3px rgba(154,166,191,.16) inset"; }
+      }
+
+      function showWarn(msg){
+        if (msg){
+          warnBox.style.display = "block";
+          warnBox.textContent = msg;
+        } else {
+          warnBox.style.display = "none";
+          warnBox.textContent = "";
+        }
+      }
+
+      function svgClear(){
+        while (svg.firstChild) { svg.removeChild(svg.firstChild); }
+      }
+
+      function svgEl(name, attrs){
+        var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+        if (attrs){
+          Object.keys(attrs).forEach(function(k){
+            n.setAttribute(k, attrs[k]);
+          });
+        }
+        return n;
+      }
+
+      function drawScene(D, Heff, ep, delta, planKey){
+        svgClear();
+
+        var W = 900, H = 420;
+        var marginL = 62, marginR = 26, marginT = 26, marginB = 40;
+
+        var yTopRoom = Math.max(0.55, ep + 0.20);
+        var yMax = Math.max(Heff + 0.8, 2.2);
+        var xMax = Math.max(D + 2.2, (2.0 * yMax) + 1.0, 5.0);
+
+        var scaleX = (W - marginL - marginR) / xMax;
+        var scaleY = (H - marginT - marginB) / (yMax + yTopRoom);
+
+        var originX = marginL;
+        var originY = marginT + yTopRoom * scaleY;
+
+        function X(xm){ return originX + xm * scaleX; }
+        function Y(ym){ return originY + ym * scaleY; }
+
+        var defs = svgEl("defs");
+        var marker = svgEl("marker", {
+          id:"arrow",
+          viewBox:"0 0 10 10",
+          refX:"9",
+          refY:"5",
+          markerWidth:"7",
+          markerHeight:"7",
+          orient:"auto-start-reverse"
+        });
+        marker.appendChild(svgEl("path", { d:"M 0 0 L 10 5 L 0 10 z", fill:"rgba(232,238,252,.85)" }));
+        defs.appendChild(marker);
+
+        var markerThin = svgEl("marker", {
+          id:"arrowThin",
+          viewBox:"0 0 10 10",
+          refX:"9",
+          refY:"5",
+          markerWidth:"6",
+          markerHeight:"6",
+          orient:"auto-start-reverse"
+        });
+        markerThin.appendChild(svgEl("path", { d:"M 0 0 L 10 5 L 0 10 z", fill:"rgba(168,179,199,.9)" }));
+        defs.appendChild(markerThin);
+
+        svg.appendChild(defs);
+
+        svg.appendChild(svgEl("rect", { x:"0", y:"0", width:String(W), height:String(H), fill:"transparent" }));
+
+        var grid = svgEl("g", { opacity:"0.35" });
+        var step = 1.0;
+        var xg;
+        for (xg = 0; xg <= xMax + 0.0001; xg += step){
+          grid.appendChild(svgEl("line", {
+            x1:String(X(xg)), y1:String(Y(-yTopRoom)),
+            x2:String(X(xg)), y2:String(Y(yMax)),
+            stroke:"rgba(255,255,255,.10)", "stroke-width":"1"
+          }));
+        }
+        var yg;
+        for (yg = 0; yg <= yMax + 0.0001; yg += step){
+          grid.appendChild(svgEl("line", {
+            x1:String(X(0)), y1:String(Y(yg)),
+            x2:String(X(xMax)), y2:String(Y(yg)),
+            stroke:"rgba(255,255,255,.08)", "stroke-width":"1"
+          }));
+        }
+        svg.appendChild(grid);
+
+        svg.appendChild(svgEl("line", {
+          x1:String(X(0)), y1:String(Y(0)),
+          x2:String(X(xMax)), y2:String(Y(0)),
+          stroke:"rgba(232,238,252,.45)", "stroke-width":"2"
+        }));
+
+        var track = svgEl("g");
+        var sleeperW = 1.2;
+        var sleeperX0 = -0.25;
+        var sleeperH = ep;
+        track.appendChild(svgEl("rect", {
+          x:String(X(sleeperX0)),
+          y:String(Y(-sleeperH)),
+          width:String(sleeperW * scaleX),
+          height:String(sleeperH * scaleY),
+          fill:"rgba(232,238,252,.18)",
+          stroke:"rgba(232,238,252,.22)"
+        }));
+
+        track.appendChild(svgEl("rect", {
+          x:String(X(-0.02)),
+          y:String(Y(-sleeperH - 0.14)),
+          width:String(0.22 * scaleX),
+          height:String(0.14 * scaleY),
+          fill:"rgba(232,238,252,.30)",
+          stroke:"rgba(232,238,252,.22)"
+        }));
+
+        track.appendChild(svgEl("rect", {
+          x:String(X(-0.10)),
+          y:String(Y(-sleeperH - 0.22)),
+          width:String(0.40 * scaleX),
+          height:String(0.10 * scaleY),
+          fill:"rgba(232,238,252,.22)",
+          stroke:"rgba(232,238,252,.20)"
+        }));
+
+        svg.appendChild(track);
+
+        var oGroup = svgEl("g");
+        oGroup.appendChild(svgEl("circle", {
+          cx:String(X(0)), cy:String(Y(0)), r:"6",
+          fill:"rgba(232,238,252,.95)"
+        }));
+        oGroup.appendChild(svgEl("circle", {
+          cx:String(X(0)), cy:String(Y(0)), r:"11",
+          fill:"transparent",
+          stroke:"rgba(79,140,255,.55)", "stroke-width":"2"
+        }));
+        var oText = svgEl("text", {
+          x:String(X(0) + 14), y:String(Y(0) - 10),
+          fill:"rgba(232,238,252,.95)",
+          "font-size":"13",
+          "font-weight":"700"
+        });
+        oText.textContent = "Point O";
+        oGroup.appendChild(oText);
+        svg.appendChild(oGroup);
+
+        function lineForK(k, label, stroke, dash){
+          var yEnd = yMax;
+          var xEnd = k * yEnd;
+          if (xEnd > xMax){
+            xEnd = xMax;
+            yEnd = xEnd / k;
+          }
+          var g = svgEl("g");
+          g.appendChild(svgEl("line", {
+            x1:String(X(0)), y1:String(Y(0)),
+            x2:String(X(xEnd)), y2:String(Y(yEnd)),
+            stroke:stroke,
+            "stroke-width":"3",
+            "stroke-dasharray":dash
+          }));
+          var tx = X(Math.min(xEnd, xMax * 0.70));
+          var ty = Y((Math.min(yEnd, yMax * 0.70)));
+          var t = svgEl("text", {
+            x:String(tx + 10),
+            y:String(ty - 8),
+            fill:"rgba(232,238,252,.9)",
+            "font-size":"12",
+            "font-weight":"750"
+          });
+          t.textContent = label + "  (k=" + String(k) + ")";
+          g.appendChild(t);
+          return g;
+        }
+
+        svg.appendChild(lineForK(2.0, "Limite zone libre", "rgba(31,169,113,.70)", "10 7"));
+        svg.appendChild(lineForK(1.5, "Plan P0 / P1", "rgba(242,201,76,.70)", "8 6"));
+        svg.appendChild(lineForK(1.0, "Plan P1 / P2", "rgba(235,87,87,.65)", "6 6"));
+
+        var exW = clamp(Math.max(1.2, 0.35 * xMax), 1.2, 3.0);
+        var ex = svgEl("g");
+        ex.appendChild(svgEl("rect", {
+          x:String(X(D)),
+          y:String(Y(0)),
+          width:String(exW * scaleX),
+          height:String(Math.max(0, Heff) * scaleY),
+          fill:"rgba(255,255,255,.07)",
+          stroke:"rgba(255,255,255,.16)",
+          "stroke-width":"2"
+        }));
+        var exLabel = svgEl("text", {
+          x:String(X(D) + 10),
+          y:String(Y(0) + 18),
+          fill:"rgba(232,238,252,.88)",
+          "font-size":"12",
+          "font-weight":"700"
+        });
+        exLabel.textContent = "Fouille";
+        ex.appendChild(exLabel);
+        svg.appendChild(ex);
+
+        var color = getCssVar("--muted");
+        if (planKey === "LIBRE") { color = getCssVar("--ok"); }
+        if (planKey === "P0") { color = getCssVar("--warn"); }
+        if (planKey === "P1") { color = getCssVar("--mid"); }
+        if (planKey === "P2") { color = getCssVar("--crit"); }
+
+        var cp = svgEl("g");
+        cp.appendChild(svgEl("circle", {
+          cx:String(X(D)), cy:String(Y(Heff)), r:"8",
+          fill:color,
+          stroke:"rgba(0,0,0,.35)",
+          "stroke-width":"2"
+        }));
+        cp.appendChild(svgEl("circle", {
+          cx:String(X(D)), cy:String(Y(Heff)), r:"14",
+          fill:"transparent",
+          stroke:color,
+          "stroke-width":"2",
+          opacity:"0.35"
+        }));
+        var cpText = svgEl("text", {
+          x:String(X(D) + 14),
+          y:String(Y(Heff) + 4),
+          fill:"rgba(232,238,252,.95)",
+          "font-size":"12",
+          "font-weight":"750"
+        });
+        cpText.textContent = "Point de contrôle";
+        cp.appendChild(cpText);
+        svg.appendChild(cp);
+
+        var dim = svgEl("g");
+
+        var dY = 0.22;
+        dim.appendChild(svgEl("line", {
+          x1:String(X(0)), y1:String(Y(dY)),
+          x2:String(X(D)), y2:String(Y(dY)),
+          stroke:"rgba(232,238,252,.85)",
+          "stroke-width":"2",
+          "marker-start":"url(#arrow)",
+          "marker-end":"url(#arrow)"
+        }));
+        dim.appendChild(svgEl("line", {
+          x1:String(X(0)), y1:String(Y(0)),
+          x2:String(X(0)), y2:String(Y(dY + 0.08)),
+          stroke:"rgba(168,179,199,.7)",
+          "stroke-width":"2"
+        }));
+        dim.appendChild(svgEl("line", {
+          x1:String(X(D)), y1:String(Y(0)),
+          x2:String(X(D)), y2:String(Y(dY + 0.08)),
+          stroke:"rgba(168,179,199,.7)",
+          "stroke-width":"2"
+        }));
+        var dText = svgEl("text", {
+          x:String((X(0) + X(D)) / 2 - 18),
+          y:String(Y(dY) - 8),
+          fill:"rgba(232,238,252,.92)",
+          "font-size":"12",
+          "font-weight":"800"
+        });
+        dText.textContent = "D";
+        dim.appendChild(dText);
+
+        var hx = D + 0.30;
+        dim.appendChild(svgEl("line", {
+          x1:String(X(hx)), y1:String(Y(0)),
+          x2:String(X(hx)), y2:String(Y(Heff)),
+          stroke:"rgba(232,238,252,.85)",
+          "stroke-width":"2",
+          "marker-start":"url(#arrow)",
+          "marker-end":"url(#arrow)"
+        }));
+        dim.appendChild(svgEl("line", {
+          x1:String(X(D)), y1:String(Y(0)),
+          x2:String(X(hx + 0.10)), y2:String(Y(0)),
+          stroke:"rgba(168,179,199,.7)",
+          "stroke-width":"2"
+        }));
+        dim.appendChild(svgEl("line", {
+          x1:String(X(D)), y1:String(Y(Heff)),
+          x2:String(X(hx + 0.10)), y2:String(Y(Heff)),
+          stroke:"rgba(168,179,199,.7)",
+          "stroke-width":"2"
+        }));
+        var hText = svgEl("text", {
+          x:String(X(hx) + 8),
+          y:String((Y(0) + Y(Heff)) / 2),
+          fill:"rgba(232,238,252,.92)",
+          "font-size":"12",
+          "font-weight":"800"
+        });
+        hText.textContent = "H_eff";
+        dim.appendChild(hText);
+
+        var info = svgEl("text", {
+          x:String(X(0)),
+          y:String(Y(yMax) + 28),
+          fill:"rgba(168,179,199,.95)",
+          "font-size":"12",
+          "font-weight":"650"
+        });
+        var deltaStr = fmt(delta, 3);
+        info.textContent = "delta=" + deltaStr + " m   |   épaisseur traverse=" + fmt(ep, 2) + " m";
+        dim.appendChild(info);
+
+        svg.appendChild(dim);
+      }
+
+      function readInputs(){
+        var H = Number(elH.value);
+        var D = Number(elD.value);
+        var devers = Number(elDevers.value);
+        var cote = String(elCote.value);
+        var ep = Number(elEp.value);
+
+        return { H:H, D:D, devers:devers, cote:cote, ep:ep };
+      }
+
+      function calculate(){
+        var inp = readInputs();
+
+        var invalid = false;
+        if (!(isFinite(inp.H) && isFinite(inp.D) && isFinite(inp.devers) && isFinite(inp.ep))) { invalid = true; }
+        if (inp.H < 0 || inp.D < 0 || inp.ep < 0) { invalid = true; }
+
+        if (invalid){
+          setBadge({ key:"ERR", label:"Entrées invalides", color:"#9aa6bf" });
+          outDelta.textContent = "—";
+          outHeff.textContent = "—";
+          outD.textContent = "—";
+          outRatio.textContent = "—";
+          measuresBox.innerHTML = "<div class=\"small\">Vérifier les valeurs saisies.</div>";
+          showWarn("Certaines entrées ne sont pas valides (valeurs négatives ou non numériques).");
+          drawScene(2.0, 1.0, 0.22, 0, "ERR");
+          return;
+        }
+
+        var delta = computeDelta(inp.devers, inp.cote);
+        var Heff = inp.H - inp.ep + delta;
+
+        var ratio;
+        if (Heff > 0){
+          ratio = inp.D / Heff;
+        } else {
+          ratio = Infinity;
+        }
+
+        var plan = planFromRatio(ratio);
+
+        outDelta.textContent = fmt(delta, 3);
+        outHeff.textContent = fmt(Heff, 3);
+        outD.textContent = fmt(inp.D, 3);
+        outRatio.textContent = (isFinite(ratio) ? fmt(ratio, 3) : "\u221E");
+
+        setBadge(plan);
+        measuresBox.innerHTML = measuresFor(plan.key);
+
+        if (Heff <= 0){
+          showWarn("Attention : H_eff \u2264 0. Cela signifie que le point de contrôle est au niveau de O ou au-dessus. Le ratio est traité comme infini pour l\u2019affichage.");
+        } else if (Heff < 0.30){
+          showWarn("Attention : H_eff est très faible. Vérifier la cohérence (TN, épaisseur de traverse, correction dévers).");
+        } else {
+          showWarn("");
+        }
+
+        drawScene(inp.D, Math.max(0, Heff), inp.ep, delta, plan.key);
+      }
+
+      function reset(){
+        elH.value = "1.50";
+        elD.value = "2.20";
+        elDevers.value = "0";
+        elCote.value = "droite";
+        elEp.value = "0.22";
+        calculate();
+      }
+
+      btnCalc.addEventListener("click", function(){
+        calculate();
+      });
+
+      btnReset.addEventListener("click", function(){
+        reset();
+      });
+
+      ["input","change"].forEach(function(evt){
+        elH.addEventListener(evt, calculate);
+        elD.addEventListener(evt, calculate);
+        elDevers.addEventListener(evt, calculate);
+        elCote.addEventListener(evt, calculate);
+        elEp.addEventListener(evt, calculate);
+      });
+
+      calculate();
+    })();
+  </script>
+</body>
+</html>
+```
